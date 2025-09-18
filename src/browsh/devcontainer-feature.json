@@ -1,0 +1,8 @@
+{
+  "id": "browsh",
+  "version": "0.0.1",
+  "name": "Browsh CLI Browser",
+  "description": "Installs Browsh (text-based browser) and its dependencies.",
+  "options": {},
+  "installsAfter": []
+}
