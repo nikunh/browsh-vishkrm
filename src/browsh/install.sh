@@ -14,28 +14,46 @@ get_architecture() {
     esac
 }
 
+echo "Installing Browsh CLI browser..."
+
 # Install Browsh and dependencies
 if ! command -v browsh &>/dev/null; then
-  # Install Firefox (required by Browsh)
-  if [ ! -f firefox.tar.bz2 ]; then
-    wget "https://download.mozilla.org/?product=firefox-latest&os=linux64&lang=en-US" -O firefox.tar.bz2
-  fi
-  if [ ! -d /opt/firefox ]; then
-    tar -xvf firefox.tar.bz2
-    sudo mv firefox /opt/ || true
-  fi
-  if [ ! -f /usr/local/bin/firefox ]; then
-    sudo ln -s /opt/firefox/firefox /usr/local/bin/firefox
-  fi
-  # Install Browsh
-  ARCH=$(get_architecture)
-  BROWSH_FILE="browsh_1.8.0_linux_${ARCH}.deb"
-  if [ ! -f ./$BROWSH_FILE ]; then
-    wget https://github.com/browsh-org/browsh/releases/download/v1.8.0/$BROWSH_FILE
-  fi
-  sudo apt-get update
-  sudo apt-get install -y ./$BROWSH_FILE
-  rm ./$BROWSH_FILE firefox.tar.bz2
+    echo "Installing required dependencies..."
+
+    # Install snapd for Firefox installation
+    sudo apt-get update
+    sudo apt-get install -y snapd
+
+    # Install Firefox via Snap (Ubuntu 22.04 preferred method)
+    echo "Installing Firefox via Snap..."
+    sudo snap install firefox
+
+    # Create firefox symlink for browsh compatibility
+    sudo ln -sf /snap/bin/firefox /usr/local/bin/firefox
+
+    # Install Browsh binary directly (avoid .deb dependency issues)
+    echo "Installing Browsh binary..."
+    ARCH=$(get_architecture)
+    BROWSH_VERSION="1.8.0"
+    BROWSH_URL="https://github.com/browsh-org/browsh/releases/download/v${BROWSH_VERSION}/browsh_${BROWSH_VERSION}_linux_${ARCH}"
+
+    # Download browsh binary
+    wget -O /tmp/browsh "${BROWSH_URL}"
+    chmod +x /tmp/browsh
+    sudo mv /tmp/browsh /usr/local/bin/browsh
+
+    echo "Browsh installation completed successfully"
+else
+    echo "Browsh is already installed"
+fi
+
+# Verify installation
+if command -v browsh &>/dev/null && command -v firefox &>/dev/null; then
+    echo "✅ Browsh and Firefox installed successfully"
+    browsh --version || echo "Browsh version check skipped"
+else
+    echo "❌ Installation verification failed"
+    exit 1
 fi
 
 # Clean up
