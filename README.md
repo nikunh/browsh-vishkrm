@@ -1,6 +1,6 @@
 # browsh-vishkrm DevContainer Feature
 
-DevContainer feature for browsh.
+DevContainer feature for browsh (text-based web browser).
 
 ## Usage
 

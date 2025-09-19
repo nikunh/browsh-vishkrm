@@ -4,6 +4,16 @@ set -e
 # Set DEBIAN_FRONTEND to noninteractive to prevent prompts
 export DEBIAN_FRONTEND=noninteractive
 
+# Function to get system architecture
+get_architecture() {
+    local arch="$(uname -m)"
+    case "$arch" in
+        x86_64|amd64) echo "amd64" ;;
+        aarch64|arm64) echo "arm64" ;;
+        *) echo "Unsupported architecture: $arch" >&2; exit 1 ;;
+    esac
+}
+
 # Install Browsh and dependencies
 if ! command -v browsh &>/dev/null; then
   # Install Firefox (required by Browsh)
@@ -18,12 +28,14 @@ if ! command -v browsh &>/dev/null; then
     sudo ln -s /opt/firefox/firefox /usr/local/bin/firefox
   fi
   # Install Browsh
-  if [ ! -f ./browsh_1.8.0_linux_amd64.deb ]; then
-    wget https://github.com/browsh-org/browsh/releases/download/v1.8.0/browsh_1.8.0_linux_amd64.deb
+  ARCH=$(get_architecture)
+  BROWSH_FILE="browsh_1.8.0_linux_${ARCH}.deb"
+  if [ ! -f ./$BROWSH_FILE ]; then
+    wget https://github.com/browsh-org/browsh/releases/download/v1.8.0/$BROWSH_FILE
   fi
   sudo apt-get update
-  sudo apt-get install -y ./browsh_1.8.0_linux_amd64.deb
-  rm ./browsh_1.8.0_linux_amd64.deb firefox.tar.bz2
+  sudo apt-get install -y ./$BROWSH_FILE
+  rm ./$BROWSH_FILE firefox.tar.bz2
 fi
 
 # Clean up
