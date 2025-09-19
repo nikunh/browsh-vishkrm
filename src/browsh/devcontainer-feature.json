@@ -4,5 +4,5 @@
   "name": "Browsh CLI Browser",
   "description": "Installs Browsh (text-based browser) and its dependencies.",
   "options": {},
-  "installsAfter": []
+  "installsAfter": ["ghcr.io/nikunh/001-dev-packages-vishkrm/001-dev-packages"]
 }
