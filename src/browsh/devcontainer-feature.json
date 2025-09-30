@@ -1,6 +1,6 @@
 {
   "id": "browsh",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "name": "Browsh CLI Browser",
   "description": "Installs Browsh (text-based browser) and its dependencies.",
   "options": {},
