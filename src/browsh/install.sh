@@ -32,16 +32,27 @@ echo "Installing Browsh CLI browser..."
 if ! command -v browsh &>/dev/null; then
     echo "Installing required dependencies..."
 
-    # Install snapd for Firefox installation
+    # Install Firefox from Mozilla's official APT repository (Docker-compatible, no snap required)
+    echo "Adding Mozilla's official APT repository..."
+
+    # Create keyrings directory if it doesn't exist
+    sudo mkdir -p /etc/apt/keyrings
+
+    # Add Mozilla's GPG key
+    wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O- | sudo tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null
+
+    # Add Mozilla's APT repository
+    echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | sudo tee -a /etc/apt/sources.list.d/mozilla.list > /dev/null
+
+    # Set package priority to prefer Mozilla's version over snap
+    echo 'Package: *
+Pin: origin packages.mozilla.org
+Pin-Priority: 1000' | sudo tee /etc/apt/preferences.d/mozilla > /dev/null
+
+    # Install Firefox from Mozilla APT repository
+    echo "Installing Firefox from Mozilla APT repository..."
     sudo apt-get update
-    sudo apt-get install -y snapd
-
-    # Install Firefox via Snap (Ubuntu 22.04 preferred method)
-    echo "Installing Firefox via Snap..."
-    sudo snap install firefox
-
-    # Create firefox symlink for browsh compatibility
-    sudo ln -sf /snap/bin/firefox /usr/local/bin/firefox
+    sudo apt-get install -y firefox
 
     # Install Browsh binary directly (avoid .deb dependency issues)
     echo "Installing Browsh binary..."
